@@ -6,12 +6,12 @@ from skimage.segmentation import mark_boundaries
 
 from sklearn.svm import SVC
 from sklearn.cluster import KMeans
+from sklearn.metrics import confusion_matrix
 from sklearn.utils import shuffle
 
 import os, fnmatch
 
 from img_utils import parse_filename, invert_binary_image, load_image_segments
-
 
 
 def classify_all_in_directory(train_dir, test_dir):
@@ -37,25 +37,10 @@ def classify_all_in_directory(train_dir, test_dir):
         save_prediction(name, pred_labels)
         #save_binary_mask(name, pred_labels)
 
-def evaluate_prediction(fname):
-    np.set_printoptions(precision=2)
-    name = parse_filename(fname)
-    image, truth, pred = load_image_data(name)
-
-    print('class\t | correct\t error\t false pos.\t false neg.')
-    print('-'*65)
-    classes = [1, 2] 
-    for val in classes:
-        total = np.sum(truth == val)
-        total_neg = np.sum(truth != val)
-        good = np.sum(np.logical_and(pred == val, truth == val))
-        false_pos = np.sum(np.logical_and(pred == val, truth != val))
-        false_neg = np.sum(np.logical_and(pred != val, truth == val))
-        error_rate = (false_pos + false_neg)/float(np.sum(pred == val))
-        fp_rate = false_pos/float(false_pos + total_neg)
-        fn_rate = false_neg/float(false_neg + total)
-        print('{:3.1f}\t | {:3.1f}\t\t {:3.1f}\t {:3.1f}\t\t {:3.1f}\t'.format(val, 100*good/float(total), 100*error_rate, 100*fp_rate, 100*fn_rate))
-
+def evaluate_prediction(y_true, y_pred):
+    C = confusion_matrix(y_true, y_pred)
+    return C
+        
 def load_image_data(name):
     fname = 'images/' + name + '_image.npy'
     image = np.load(fname)
