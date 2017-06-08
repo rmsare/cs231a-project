@@ -1,5 +1,12 @@
 """
-Classify pixels in images
+Classification of pixels in images using color features.
+
+Project uses the following directory structure:
+
+    images/     - contains binary files of numpy arrays corresponding to survey images
+    labelled/   - contains labelled ground truth images or training data
+    results/    - contains results of classification
+
 Author: Robert Sare
 E-mail: rmsare@stanford.edu
 Date: 8 June 2017
@@ -18,11 +25,14 @@ from sklearn.utils import shuffle
 
 import os, fnmatch
 
+def classify_directory(classifier, test_dir, train_dir='train/'):
+    """
+    Classify all images in a directory using an arbitrary sklearn classifier.  
 
-def cluster_image_kmeans(image):
-    pass
+    Saves results to results/ directory.
+    """
 
-def classify_directory_svm(classifier, test_dir):
+    # XXX: This is here if the classifier needs to be trained from scratch
     #print("Preparing training data...")
     #n_samples = 1000
     #train_data, train_labels = load_training_images(train_dir, n_samples)
@@ -35,10 +45,10 @@ def classify_directory_svm(classifier, test_dir):
 
     for f in files:
         image = skimage.io.imread(f)
-        ht, wid, dep = image.shape
+        height, width, depth = image.shape
 
         print("Predicting labels for " + f.strip('.JPG') + ".jpg")
-        features = skimage.color.rgb2lab(image).reshape((ht*wid, dep))
+        features = compute_colorxy_features(image) 
         features /= features.max(axis=0)
         pred_labels = classifier.predict(features)
  
@@ -46,13 +56,33 @@ def classify_directory_svm(classifier, test_dir):
         print("Saving predictions for " + f.strip('.JPG') + ".jpg")
         plt.figure()
         plt.imshow(image)
-        plt.imshow(pred_labels.reshape((ht, wid)), alpha=0.5, vmin=0, vmax=2)
+        plt.imshow(pred_labels.reshape((height, width)), alpha=0.5, vmin=0, vmax=2)
         plt.show(block=False)
-        plt.savefig('/home/rmsare/results/' + f.strip('.JPG') + '_svm2_pred.png')
+        plt.savefig('results/' + f.strip('.JPG') + '_svm_pred.png')
         plt.close()
-        np.save('/home/rmsare/results/' + f.strip('.JPG') + 'svm2.npy', pred_labels.reshape((ht,wid)))
+        np.save('results/' + f.strip('.JPG') + 'svm.npy', pred_labels.reshape((height,width)))
+
+def compute_colorxy_features(image):
+    """
+    Extract and normalize color and pixel location features from image data
+    """
+
+    height, width, depth = image.shape
+    colors = skimage.color.rgb2lab(image.reshape((height*width, depth))
+    X, Y = np.meshgrid(np.arange(height), np.arange(width))
+    xy = np.hstack([X.reshape((height*width, 1)), Y.reshape((height*width, 1))])
+
+    colorxy = np.hstack([xy, colors])
+    colorxy /= colorxy.max(axis=0)
+    
+    return colorxy 
 
 def load_ground_truth(filename):
+    """
+    Load ground truth or training image array and redefine labelling for nice
+    default colors
+    """
+
     truth = np.load(filename)
 
     # Change labels for nice default colorscale when plotted
@@ -65,6 +95,10 @@ def load_ground_truth(filename):
     return truth
 
 def load_image_labels(name):
+    """
+    Load image and labels from previous labelling session
+    """
+
     fname = 'images/' + name + '_image.npy'
     image = np.load(fname)
     fname = 'labelled/' + name + '_labels.npy'
@@ -73,6 +107,10 @@ def load_image_labels(name):
     return image, labels
 
 def plot_class_image(image, segments, labels):
+    """
+    Display image with segments and class label overlay
+    """
+
     plt.figure()
     plt.subplot(1,2,1)
     plt.imshow(mark_boundaries(image, segments, color=(1,0,0), mode='thick'))
@@ -80,14 +118,17 @@ def plot_class_image(image, segments, labels):
 
     plt.subplot(1,2,2)
     plt.imshow(image)
-    plt.imshow(labels, alpha=0.75, vmin=1, vmax=2, cmap=plt.cm.Set1)
+    plt.imshow(labels, alpha=0.75)
     cb = plt.colorbar(orientation='horizontal', shrink=0.5)
     plt.title('predicted class labels')
     plt.show(block=False)
 
-def load_training_images(train_dir, n_samples):
-    n_feat = 3
-    train_data = np.empty((0, n_feat))
+def load_training_images(train_dir, n_samples=1000, n_features=3):
+    """
+    Load training images from directory and subsample for training or validation 
+    """
+
+    train_data = np.empty((0, n_features))
     train_labels = np.empty(0)
     files = os.listdir(train_dir)
 
@@ -95,7 +136,6 @@ def load_training_images(train_dir, n_samples):
         name = parse_filename(f)
         image, labels = load_image_labels(name)
         ht, wid, depth = image.shape
-        # TODO: add feature here
         train_data = np.append(train_data, 
                 compute_color_features(image), axis=0)
         train_labels = np.append(train_labels, 
@@ -106,41 +146,8 @@ def load_training_images(train_dir, n_samples):
     return train_data, train_labels
 
 def save_prediction(name, pred_labels):
-    np.save('predict/' + name + '_pred', pred_labels)
-
-
-class Image(object):
-
-    def __init__(self, filename):
-        self.imdata = skimage.io.imread(filename)
-        self.height, self.width, _ = self.imdata.shape
-        self.colorxy = self.compute_colorxy_features()
-
-    def compute_colorxy_features(self):
-        colors = skimage.color.rgb2lab(self.imdata)
-        X, Y = np.meshgrid(np.arange(self.height), np.arange(self.width))
-        xy = np.hstack([X.reshape((self.height*self.width, 1)), Y.reshape((self.height*self.width, 1))])
-
-        colorxy_data = np.hstack([xy, colors])
-        colorxy_data /= colorxy_data.max(axis=0)
-
-        return colorxy_data
-    
-    def compute_glcm_features(self):
-        pass
-
-    def compute_gabor_features(self):
-        pass
-
-class ImageSVC(SVC):
-
-    def fit_image(self, image):
-        self.fit(image.colorxy)
-
-    def classify_image(self, image):
-        ht, wid, depth = image.shape
-        # TODO: compute other features
-        pred_labels = self.predict(image.colorxy)
-
-        return pred_labels.reshape((wid, ht))
+    """
+    Save predicted class labels 
+    """
+    np.save('results/' + name + '_pred', pred_labels)
 

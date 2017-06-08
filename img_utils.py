@@ -1,5 +1,6 @@
 """
 Utility functions for processing images
+
 Author: Robert Sare
 E-mail: rmsare@stanford.edu
 Date: 8 June 2017

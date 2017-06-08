@@ -1,5 +1,6 @@
 """
 Utilities for labelling images
+
 Author: Robert Sare
 E-mail: rmsare@stanford.edu
 Date: 8 June 2017
@@ -17,12 +18,23 @@ from copy import copy
 
 def assign_label(x, y, label, segments):
     """
-    
+    Assign label to segment 
     """
     value = segments[y, x]
     labelled_image[segments == value] = label
 
 def label_point(event):
+    """
+    Label segment under cursor at key press event.
+    Supported labels:
+        [g]round
+        [v]egetation
+        [s]hadow
+        [n]ull
+
+    Quits on "q" keypress.
+    """
+
     if event.key == 'q':
         # Default: all unlabelled points saved as ground
         labelled_image[np.isnan(labelled_image)] = 1
@@ -45,6 +57,10 @@ def label_point(event):
     plt.draw()
 
 def label_image():
+    """
+    Label image until callback function exits.
+    """
+
     print("Label points: [g]round, [v]egetation, [s]hadow, [n]ull, or [u]ndo. [q] to quit and save.")
     print("Unlabelled points will default to [g]round")
 
@@ -52,6 +68,10 @@ def label_image():
     fig.canvas.mpl_connect('key_press_event', label_point)
 
 def load_image_segments(name):
+    """
+    Load image and segmentation corresponding to base name "name"
+    """
+
     fname = 'images/' + name + '_image.npy'
     image = np.load(fname)
     fname = 'images/' + name + '_seg.npy'
