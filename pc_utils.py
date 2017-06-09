@@ -14,8 +14,12 @@ Import statements for this library are included within function definitions so
 other processing can take place outside PhotoScan. 
 """
 
+import skimage
 from sklearn import linear_model
+
 import numpy as np
+import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
 
 def load_class_labels(name):
     return np.load('predicted/' + name + '_pred.npy')
@@ -47,6 +51,12 @@ def classify_points(classifier, points, features):
 def estimate_ground_plane(classified_points, ground_label=2, thresh=0.1):
     """
     Estimate ground plane from classified point cloud
+
+    Returns:
+        coef        - a and b, the x and y coefficents of the plane Z = a*X + b*Y + c
+        intercept   - the plane's intercept
+        inliers     - mask of RANSAC plane inliers
+        outliers    - mask of RANSAC plane outliers
     """
 
     ground_points = classified_points[classified_points[:,3] == ground_label]
@@ -58,7 +68,21 @@ def estimate_ground_plane(classified_points, ground_label=2, thresh=0.1):
                                           residual_threshold=thresh)
     ransac.fit(XY, Z)
     
-    return ransac.estimator_.coef_, ransac.inlier_mask_, np.logical_not(ransac.inlier_mask_)
+    return ransac.estimator_.coef_, ransac.estimator_.intercept_, ransac.inlier_mask_, np.logical_not(ransac.inlier_mask_)
+
+def calculate_plane_orientation_angles(normal):
+    """
+    Calculate orientation angles of a plane from its normal vector.
+    """
+    ex = np.array([1, 0, 0])
+    ey = np.array([0, 1, 0])
+    ez = np.array([0, 0, 1])
+
+    theta_x = (180/np.pi)*np.arccos(normal.dot(ex)/np.linalg.norm(normal))
+    theta_y = (180/np.pi)*np.arccos(normal.dot(ey)/np.linalg.norm(normal))
+    theta_z = (180/np.pi)*np.arccos(normal.dot(ez)/np.linalg.norm(normal))
+
+    return theta_x, theta_y, theta_z
 
 def get_modal_point_label(point, cameras):
     """
@@ -94,6 +118,7 @@ def project_features(camera, points, features):
                              values corresponding to pixels in the image
     """
     import PhotoScan
+
     image_height = int(camera.meta['File/ImageHeight'])
     image_width = int(camera.meta['File/ImageWidth'])
     projected_features = np.zeros_like((image_height, image_width))
@@ -107,6 +132,18 @@ def project_features(camera, points, features):
             projected_features[y, x] = features[i]
 
     return projected_features.reshape((image_height, image_width))
+
+def plot_ransac_plane(XY, coef, intercept):
+    fig = plt.figure()
+    ax = fig.add_subplot(111, projection='3d')
+
+    x = np.arange(np.min(XY[:,0]), np.max(XY[:,0]))
+    y = np.arange(np.min(XY[:,1]), np.max(XY[:,1]))
+    X, Y = np.meshgrid(x, y)
+    Zp = coef[0]*X + coef[1]*Y + intercept
+
+    ax.plot_surface(x, Y, Zp, alpha=0.5)
+    plt.show()
 
 def read_camera_matrix(filename):
     """
@@ -126,9 +163,3 @@ def read_camera_matrix(filename):
     
     return M.reshape((4,4))
 
-if __name__ == "__main__":
-    doc = PhotoScan.app.doc
-    cam = doc.chunks[0].cameras[0]
-    filename = '/home/rmsare/horseshoe_dense.txt'
-    points, features = load_point_cloud(filename)
-    proj = project_features(cam, points, features)
