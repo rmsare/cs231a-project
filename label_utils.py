@@ -49,9 +49,9 @@ def label_point(event):
              }
 
     print("Keypress registered")
-    print("Segment: {} | Label: {}".format(segments[event.ydata, event.xdata], event.key))
+    print("Segment: {} | Label: {}".format(segments[int(event.ydata), int(event.xdata)], event.key))
     
-    assign_label(event.xdata, event.ydata, labels[event.key], segments)
+    assign_label(int(event.xdata), int(event.ydata), labels[event.key], segments)
 
     im.set_data(labelled_image)
     plt.draw()
@@ -83,7 +83,7 @@ def save_results(name, labelled_image):
     np.save('labelled/' + name + '_labels', labelled_image)
 
 if __name__ == "__main__":
-    name = 'DJI_0819'
+    name = 'DJI_0820'
     image, segments = load_image_segments(name)
     labelled_image = np.full(image[:,:,0].shape, np.nan)
 
