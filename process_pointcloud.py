@@ -1,5 +1,5 @@
 """
-Point-cloud processing and ground plane estimation utilities.
+Point-cloud processing and ground plane estimation
 
 Author: Robert Sare
 E-mail: rmsare@stanford.edu
@@ -32,6 +32,10 @@ def load_point_cloud(filename, npoints=1000, ncols=9):
 
     where R, G, B are color channels (0, 255) and NX, NY, NZ denote the 
     components of the point normal in a local coordinate system.
+    
+    Returns:
+        points      - Nx3 array of point positions in cartesian coordinates
+        features    - NxP array of feature vectors corresponding to each point
     """
 
     data = np.fromfile(open(filename, 'r'), sep=' ', count=npoints*ncols)
@@ -89,7 +93,6 @@ def get_modal_point_label(point, cameras):
     """
     Compute distribution of class labels for a 3D points from classified images.
     Requires PhotoScan library.
-
 
     Returns:
         label_dist - distribution of class labels from corresponding 2D points
@@ -171,4 +174,3 @@ def read_camera_matrix(filename):
     M = np.array([float(x) for x in s])
     
     return M.reshape((4,4))
-
