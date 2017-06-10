@@ -92,6 +92,7 @@ def get_modal_point_label(point, cameras):
         label_dist - distribution of class labels from corresponding 2D points
     """
     import PhotoScan
+    cameras = PhotoScan.app.document.chunks[0].cameras
 
     label_dist = []
     for camera in cameras:
