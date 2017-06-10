@@ -3,9 +3,10 @@ Classification of pixels in images using color and other features.
 
 General pipeline usage:
 
-1. Prepare training data (img_utils.py and label_image.py)
-2. Train or fit classifier (sklearn KMeans, MeanShift, SVC)
-3. Predict labels on new image or directory (classify_directory)
+1. Load and segment images (img_utils.py)
+2. Prepare training data (label_image.py)
+3. Train or fit classifier (sklearn KMeans, MeanShift, SVC)
+4. Predict labels on new image or directory (classify_directory)
 
 Project uses the following directory structure:
 
