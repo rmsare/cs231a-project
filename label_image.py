@@ -1,6 +1,15 @@
 """
 Utilities for labelling images
 
+Usage: 
+1. Change name variable to specify image to label (e.g., "DJI_0825" for DJI_0825.JPG)
+2. Hover cursor over segment to label
+3. Press key corresponding to label ([g]round, [v]egetation, [s]hadow, ...)
+4. Change labels or [u]ndo as necessary
+5. Quit and save with [q]
+
+By default, all unlabelled pixels are assigned to ground class. Results are saved to 'labelled/' directory.
+
 Author: Robert Sare
 E-mail: rmsare@stanford.edu
 Date: 8 June 2017
@@ -83,10 +92,12 @@ def save_results(name, labelled_image):
     np.save('labelled/' + name + '_labels', labelled_image)
 
 if __name__ == "__main__":
+    # Load image to label
     name = 'DJI_0820'
     image, segments = load_image_segments(name)
     labelled_image = np.full(image[:,:,0].shape, np.nan)
 
+    # Set up plot
     fig = plt.figure()
     ax = fig.add_subplot(1, 1, 1)
     base_im = ax.imshow(mark_boundaries(image, segments, color=(1,0,0), mode='thick'))
@@ -95,4 +106,5 @@ if __name__ == "__main__":
     im = ax.imshow(labelled_image, alpha=0.5, vmin=1, vmax=2, cmap=palette)
     plt.show(block=False)
 
+    # Label image, updating plot until user quits
     label_image()
