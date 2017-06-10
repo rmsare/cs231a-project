@@ -5,7 +5,7 @@ General pipeline usage:
 
 1. Load and segment images (img_utils.py)
 2. Prepare training data (label_image.py)
-3. Train or fit classifier (sklearn KMeans, MeanShift, SVC)
+3. Train classifier or cluster data (sklearn KMeans, MeanShift, SVC, etc.)
 4. Predict labels on new image or directory (classify_directory())
 5. Apply classification to 3D points and estimate ground plane orientation (process_pointcloud.py)
 
@@ -162,8 +162,14 @@ def save_prediction(name, pred_labels):
     np.save('results/' + name + '_pred', pred_labels)
                                    
 if __name__ == "__main__":
+    # Load training data
     train_dir = 'train/'
+    test_dir = 'test/'
     train_data, train_labels = load_training_data(train_dir)
+                                   
+    # Train classifier
     clf = SVC()
     clf.fit(train_data, train_labels)
-    classify_directory('test/')
+    
+    # Predict labels for test images
+    classify_directory(clf, test_dir)
