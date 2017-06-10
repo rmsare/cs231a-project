@@ -6,7 +6,8 @@ General pipeline usage:
 1. Load and segment images (img_utils.py)
 2. Prepare training data (label_image.py)
 3. Train or fit classifier (sklearn KMeans, MeanShift, SVC)
-4. Predict labels on new image or directory (classify_directory)
+4. Predict labels on new image or directory (classify_directory())
+5. Apply classification to 3D points and estimate ground plane orientation (process_pointcloud.py)
 
 Project uses the following directory structure:
 
