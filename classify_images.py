@@ -1,11 +1,19 @@
 """
-Classification of pixels in images using color features.
+Classification of pixels in images using color and other features.
+
+General pipeline usage:
+
+1. Prepare training data (img_utils.py and label_image.py)
+2. Train or fit classifier (sklearn KMeans, MeanShift, SVC)
+3. Predict labels on new image or directory (classify_directory)
 
 Project uses the following directory structure:
 
-    images/     - contains binary files of numpy arrays corresponding to survey images
+    images/     - contains binary files of numpy arrays corresponding to survey images and segmentations
     labelled/   - contains labelled ground truth images or training data
     results/    - contains results of classification
+    
+I store randomly split training and testing images in test/ and train/ directories.
 
 Author: Robert Sare
 E-mail: rmsare@stanford.edu
@@ -150,4 +158,10 @@ def save_prediction(name, pred_labels):
     Save predicted class labels 
     """
     np.save('results/' + name + '_pred', pred_labels)
-
+                                   
+if __name__ == "__main__":
+    train_dir = 'train/'
+    train_data, train_labels = load_training_data(train_dir)
+    clf = SVC()
+    clf.fit(train_data, train_labels)
+    classify_directory('test/')
