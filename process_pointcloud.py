@@ -47,7 +47,7 @@ def load_point_cloud(filename, npoints=1000, ncols=9):
     features /= features.max(axis=0)
     return points, features
 
-def classify_points(classifier, points, features):
+def classify_points(clf, points, features):
     labels = clf.predict(features)
     classified_points = np.hstack([points, labels])
     return classified_points
@@ -153,7 +153,7 @@ def plot_ransac_plane(XY, coef, intercept):
     X, Y = np.meshgrid(x, y)
     Zp = coef[0]*X + coef[1]*Y + intercept
 
-    ax.plot_surface(x, Y, Zp, alpha=0.5)
+    ax.plot_surface(X, Y, Zp, alpha=0.5)
     plt.show()
 
 def read_camera_matrix(filename):
