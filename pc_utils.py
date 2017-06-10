@@ -114,13 +114,14 @@ def project_features(camera, points, features):
     Project feature values from 3D points onto an image using the camera matrix.
 
     Returns:
-        projected_features - an array of (image_height, image_width) of feature
+        projected_features - an array of (image_height, image_width, nfeatures) of feature
                              values corresponding to pixels in the image
     """
     import PhotoScan
 
     image_height = int(camera.meta['File/ImageHeight'])
     image_width = int(camera.meta['File/ImageWidth'])
+    _, nfeatures = features.shape
     projected_features = np.zeros_like((image_height, image_width))
 
     for i, P in enumerate(points):
@@ -131,7 +132,7 @@ def project_features(camera, points, features):
         if x_in_image and y_in_image:
             projected_features[y, x] = features[i]
 
-    return projected_features.reshape((image_height, image_width))
+    return projected_features.reshape((image_height, image_width, nfeatures))
 
 def plot_ransac_plane(XY, coef, intercept):
     fig = plt.figure()
