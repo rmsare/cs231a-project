@@ -5,7 +5,7 @@ Author: Robert Sare
 E-mail: rmsare@stanford.edu
 Date: 8 June 2017
 
-Some functions equire PhotoScan library and must be run in PhotoScan IPython 
+Some functions require PhotoScan library and must be run in PhotoScan IPython 
 console. See API documentation at:
 
 http://www.agisoft.com/pdf/photoscan_python_api_1_3_2.pdf
@@ -74,6 +74,7 @@ def calculate_plane_orientation_angles(normal):
     """
     Calculate orientation angles of a plane from its normal vector.
     """
+    
     ex = np.array([1, 0, 0])
     ey = np.array([0, 1, 0])
     ez = np.array([0, 0, 1])
@@ -87,10 +88,13 @@ def calculate_plane_orientation_angles(normal):
 def get_modal_point_label(point, cameras):
     """
     Compute distribution of class labels for a 3D points from classified images.
+    Requires PhotoScan library.
+
 
     Returns:
         label_dist - distribution of class labels from corresponding 2D points
     """
+    
     import PhotoScan
     cameras = PhotoScan.app.document.chunks[0].cameras
 
@@ -113,11 +117,13 @@ def get_modal_point_label(point, cameras):
 def project_features(camera, points, features):
     """
     Project feature values from 3D points onto an image using the camera matrix.
+    Requires PhotoScan library.
 
     Returns:
         projected_features - an array of (image_height, image_width, nfeatures) of feature
                              values corresponding to pixels in the image
     """
+    
     import PhotoScan
 
     image_height = int(camera.meta['File/ImageHeight'])
@@ -151,6 +157,7 @@ def read_camera_matrix(filename):
     """
     Read camera matrix from text file exported by PhotoScan
     """
+    
     f = open(filename, 'r')
     s = f.read()
     f.close()
