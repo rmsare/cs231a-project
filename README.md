@@ -4,6 +4,8 @@ Code for segmentation/classification of UAV images over an active volcano for CS
 
 Requires skimage, sklearn, numpy, matplotlib, and (optionally) commerical PhotoScan API
 
+![SVM results](https://www.dropbox.com/s/aqnso1w5w27234o/svm_results.gif)
+
 ## Changelog
 Date | Description
 ---- | -----------
