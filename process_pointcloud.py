@@ -160,10 +160,8 @@ def read_camera_matrix(filename):
     """
     Read camera matrix from text file exported by PhotoScan
     """
-    
-    f = open(filename, 'r')
-    s = f.read()
-    f.close()
+    with open(filename, 'r') as f:
+        s = f.read()
 
     s = s.split(',')
     s = [x.strip('\Matrix([[') for x in s]
