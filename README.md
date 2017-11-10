@@ -1,4 +1,5 @@
 # cs231a-project
+<img src=https://github.com/rmsare/cs231a-project/raw/master/svm_results.gif height="240px" width="320px">
 
 Code for segmentation/classification of UAV images over an active volcano for CS231A project (Stanford Spring 2017)
 
