@@ -89,7 +89,7 @@ def calculate_plane_orientation_angles(normal):
 
     return theta_x, theta_y, theta_z
 
-def get_modal_point_label(point, cameras):
+def get_point_label_distribution(point, cameras):
     """
     Compute distribution of class labels for a 3D points from classified images.
     Requires PhotoScan library.
