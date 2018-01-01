@@ -40,11 +40,11 @@ def save_results(name, image, segments):
 def segment_all_in_directory(dirname, factor, sigma):
     files = os.listdir(dirname)
 
-    for file in files:
-        if fnmatch.fnmatch(file, '*.JPG'):
-            print("Processing " + file + "...")
-            name = parse_filename(file)
-            image = img_as_float(imread(dirname + file)[0])
-            n_seg = int(np.prod(image[:,:,0].shape)/factor)
+    for filename in files:
+        if fnmatch.fnmatch(filename, '*.JPG'):
+            print("Processing " + filename + "...")
+            name = parse_filename(filename)
+            image = img_as_float(imread(dirname + filename)[0])
+            n_seg = int(np.prod(image[:,:,0].shape) / factor)
             segments = slic(image, n_segments=n_seg, sigma=sigma)
             save_results(name, image, segments)
