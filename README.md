@@ -11,7 +11,7 @@ Code for simple segmentation/classification of UAV images and photogrammetric po
 
 Applied to survey images over an active volcano to identify ground, vegetation and shadow points for CS231A project (Stanford Spring 2017).
 
-Requires skimage, sklearn, numpy, matplotlib, and (optionally) commerical PhotoScan API for photogrammetric point cloud classification.
+Requires skimage, sklearn, numpy, matplotlib, and (optionally) commerical PhotoScan API for photogrammetry.
 
 Contact me ([robertmsare@gmail.com](mailto:robertmsareNO@SPAMgmail.com)) with any questions, bugs, or suggestions. 
 
