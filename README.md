@@ -3,6 +3,7 @@
 
 Code for simple segmentation/classification of UAV images and photogrammetric point clouds. Main functionality:
 
+- Preprocessing: segment images and extract various features
 - Label training or validation images
 - Predict pixel labels by SVM or *k*-means
 - Project pixel labels onto a point cloud aligned with survey images
